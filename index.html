@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniPark India | National Smart Parking & Toll Network</title>
+  <meta name="description" content="India's leading smart parking reservation and telemetry network. Search parking spots, pay using UPI or FASTag, and monitor live sensors nationwide.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- LOGIN SCREEN VIEW -->
+  <div id="login-screen-view">
+    <div class="login-card glass-panel">
+      <div class="logo-section" style="justify-content: center; margin-bottom: 8px;">
+        <div class="logo-icon" style="width: 48px; height: 48px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 2v4M12 18v4M4 12H2M22 12h-2"/>
+          </svg>
+        </div>
+      </div>
+      <h2 style="font-size: 24px; text-align: center;" class="text-gradient">OmniPark India</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); text-align: center; margin-top: 4px; margin-bottom: 24px;">
+        National IoT Smart Parking Portal Login
+      </p>
+
+      <form id="login-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label for="login-email">Email ID</label>
+          <div class="input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <input type="email" id="login-email" placeholder="Enter your email address..." required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label for="login-role">Select Access Role</label>
+          <div class="input-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <select id="login-role">
+              <option value="user" selected>Standard User (Bookings & Search)</option>
+              <option value="admin">System Administrator (Full Override)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn" id="btn-login-submit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+          </svg>
+          Authorize & Enter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP WORKSPACE CONTAINER -->
+  <div class="app-container" id="app-main-content" style="display: none;">
+    
+    <!-- HEADER -->
+    <header class="glass-panel">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 2v4M12 18v4M4 12H2M22 12h-2"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1 class="text-gradient">OmniPark India</h1>
+          <p id="header-subtitle">National IoT Parking Network</p>
+        </div>
+      </div>
+
+      <!-- Navigation & Breadcrumbs -->
+      <div id="navigation-breadcrumbs" style="display: none;">
+        <div class="breadcrumbs">
+          <button class="btn-back" id="btn-back-to-portal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            All Cities
+          </button>
+          <span style="color: var(--text-muted);">&rarr;</span>
+          <span id="breadcrumb-city" style="font-weight: 700; color: #fff;">Bengaluru</span>
+          <span style="color: var(--text-muted);">&rarr;</span>
+          <span id="breadcrumb-hub" style="color: var(--text-secondary);">Koramangala Hub</span>
+        </div>
+      </div>
+
+      <!-- User Session Badging & Logout -->
+      <div class="live-stats" style="align-items: center; gap: 16px;">
+        <!-- User Badge -->
+        <div id="user-profile-badge" style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); padding: 8px 14px; border-radius: 12px;">
+          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-vacant); box-shadow: 0 0 6px var(--color-vacant);"></div>
+          <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <span id="user-email-display" style="font-size: 12px; font-weight: 600; color: #fff;">user@email.com</span>
+            <span id="user-role-display" style="font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-top: 1px;">USER</span>
+          </div>
+          <button class="btn-back" id="btn-logout" style="border: none; background: transparent; padding: 4px 6px; border-radius: 4px; color: var(--color-occupied); margin-left: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- System-wide Telemetry Badges -->
+        <div class="stat-badge stat-total">
+          <div class="stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
+            </svg>
+          </div>
+          <div class="stat-details">
+            <span class="stat-num" id="count-total">384</span>
+            <span class="stat-label" id="label-total">Total Spots</span>
+          </div>
+        </div>
+
+        <div class="stat-badge stat-vacant">
+          <div class="stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="stat-details">
+            <span class="stat-num" id="count-vacant">--</span>
+            <span class="stat-label">Available</span>
+          </div>
+        </div>
+
+        <div class="stat-badge stat-occupied">
+          <div class="stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+              <line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <div class="stat-details">
+            <span class="stat-num" id="count-occupied">--</span>
+            <span class="stat-label">Occupied</span>
+          </div>
+        </div>
+
+        <div class="stat-badge stat-ev">
+          <div class="stat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/>
+              <line x1="23" y1="21" x2="23" y2="3"/>
+              <path d="M11 6l-4 6h6l-4 6"/>
+            </svg>
+          </div>
+          <div class="stat-details">
+            <span class="stat-num" id="count-ev">--</span>
+            <span class="stat-label">EV Bays Free</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: NATIONAL PORTAL -->
+    <div id="national-portal-view">
+      
+      <!-- Hero Header -->
+      <section class="national-hero glass-panel">
+        <h2 class="text-gradient">India's Smart Parking Dashboard</h2>
+        <p>Real-time occupancy tracking, electric vehicle charging reservations, and digital toll integrations across major metropolitan cities.</p>
+        
+        <!-- Nationwide Locator search -->
+        <div style="width: 100%; max-width: 550px; margin-top: 10px;">
+          <form id="national-search-form" onsubmit="event.preventDefault();">
+            <div style="display: flex; gap: 8px;">
+              <div class="input-wrapper" style="flex-grow: 1;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="national-search-plate" placeholder="Find my car nationally (Enter license plate, e.g. MH-12-AB-1234)..." required>
+              </div>
+              <button type="submit" class="btn" style="width: auto; padding: 0 24px;">Locate Car</button>
+            </div>
+          </form>
+          <div id="national-search-error" style="color: var(--color-occupied); font-size: 13px; margin-top: 8px; display: none;"></div>
+        </div>
+      </section>
+
+      <!-- Active Cities Grid -->
+      <section class="city-grid" id="cities-container">
+        <!-- Dynamically populated via JS with cities -->
+      </section>
+
+    </div>
+
+    <!-- VIEW 2: FACILITY DASHBOARD -->
+    <div id="facility-dashboard-view" class="dashboard-grid" style="display: none;">
+      
+      <!-- LEFT COLUMN: LOCATION, BOOKING, SEARCH -->
+      <section class="sidebar-panel">
+        
+        <!-- Hub Location Details -->
+        <div class="glass-panel location-card">
+          <h2 class="panel-title" style="margin-bottom: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            Location Details
+          </h2>
+          <div class="location-address">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+            </svg>
+            <span id="hub-address-text">Address loading...</span>
+          </div>
+          <div class="location-landmarks">
+            <span class="location-landmarks-title">Key Landmarks</span>
+            <div id="hub-landmarks-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+          <a id="btn-google-maps-link" href="#" target="_blank" class="btn btn-secondary" style="font-size: 12px; padding: 10px; text-decoration: none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+              <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+              <line x1="9" y1="3" x2="9" y2="18"/>
+              <line x1="15" y1="6" x2="15" y2="21"/>
+            </svg>
+            Open in Google Maps
+          </a>
+        </div>
+
+        <!-- Booking Panel -->
+        <div class="glass-panel booking-panel">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Book Parking Bay
+          </h2>
+          <form id="booking-form" onsubmit="event.preventDefault();">
+            
+            <div class="form-group">
+              <label>Selected Spot</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="selected-spot-indicator" id="selected-spot-id">NONE</span>
+                <span style="font-size: 11px; color: var(--text-secondary);" id="selected-spot-type-label">Select a vacant spot on the map</span>
+              </div>
+            </div>
+
+            <!-- Occupancy Info Card (visible when occupied/reserved spot is selected) -->
+            <div id="spot-occupancy-info-card" style="display: none; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); padding: 14px; border-radius: 10px; margin-bottom: 16px; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10px; font-weight: 700; color: var(--color-occupied); text-transform: uppercase;">Occupancy Status</span>
+                <span id="spot-timer-countdown" style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #fff; background: rgba(239,68,68,0.2); padding: 2px 8px; border-radius: 4px;">00:00:00</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 6px; font-size: 11px; margin-top: 4px; color: var(--text-secondary);">
+                <div>Check-In: <span id="spot-info-checkin" style="color: #fff; font-weight: 600;">--</span></div>
+                <div>Duration: <span id="spot-info-duration" style="color: #fff; font-weight: 600;">--</span></div>
+                <div>Plate: <span id="spot-info-plate" style="color: #fff; font-weight: 600; font-family: var(--font-mono);">--</span></div>
+                <div>Category: <span id="spot-info-type" style="color: #fff; font-weight: 600; text-transform: uppercase;">--</span></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="plate-number">License Plate (e.g. KA-03-HA-8392)</label>
+              <div class="input-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                  <line x1="7" y1="15" x2="7.01" y2="15"/>
+                  <line x1="17" y1="15" x2="17.01" y2="15"/>
+                </svg>
+                <input type="text" id="plate-number" placeholder="Enter registration plate..." required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (Hours)</label>
+              <div class="input-wrapper">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <select id="duration">
+                  <option value="1">1 Hour</option>
+                  <option value="2">2 Hours (5% discount)</option>
+                  <option value="4">4 Hours (10% discount)</option>
+                  <option value="8">8 Hours (20% discount)</option>
+                  <option value="24">24 Hours (Flat rate)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- PAYMENT SELECTION -->
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label>Payment Method</label>
+              <div class="payment-selector">
+                <div class="payment-option active" data-payment="upi">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                  <span>BHIM UPI</span>
+                </div>
+                <div class="payment-option" data-payment="fastag">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                  </svg>
+                  <span>FASTag</span>
+                </div>
+                <div class="payment-option" data-payment="card">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <line x1="2" y1="10" x2="22" y2="10"/>
+                  </svg>
+                  <span>Card</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAYMENT CONDITIONAL DETAILS PANES -->
+            <div class="payment-details-pane">
+              <!-- UPI Pane -->
+              <div id="pane-upi">
+                <div class="form-group" style="margin-bottom: 8px;">
+                  <label for="upi-id" style="font-size: 10px;">UPI Address (Virtual Payment Address)</label>
+                  <input type="text" id="upi-id" placeholder="e.g. mobile@upi" value="user@paytm" style="padding: 8px 12px; padding-left: 12px; font-size: 12px;">
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                  <div style="width: 50px; height: 50px; background: #fff; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    <!-- Tiny mock QR SVG -->
+                    <svg viewBox="0 0 24 24" fill="#000" style="width: 100%; height: 100%;">
+                      <rect x="0" y="0" width="6" height="6" />
+                      <rect x="18" y="0" width="6" height="6" />
+                      <rect x="0" y="18" width="6" height="6" />
+                      <rect x="8" y="8" width="8" height="8" />
+                      <rect x="2" y="10" width="2" height="2" />
+                      <rect x="10" y="2" width="4" height="2" />
+                      <rect x="20" y="10" width="2" height="4" />
+                    </svg>
+                  </div>
+                  <span style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">Scan Dynamic QR displayed in checkout to approve instantly on your UPI App.</span>
+                </div>
+              </div>
+
+              <!-- FASTag Pane -->
+              <div id="pane-fastag" style="display: none;">
+                <div style="color: var(--color-ev); font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  FASTag Autopay Active
+                </div>
+                <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">System will query the NHAI database for the entered license plate. The reservation charge will be automatically debited from your linked FASTag RFID account upon entering the lot.</p>
+              </div>
+
+              <!-- Card Pane -->
+              <div id="pane-card" style="display: none;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+                  <input type="text" id="card-num" placeholder="Card Number" value="4312 8902 4310 8820" style="padding: 8px; padding-left: 10px; font-size: 12px;" disabled>
+                  <input type="text" id="card-exp" placeholder="MM/YY" value="12/29" style="padding: 8px; padding-left: 10px; font-size: 12px;" disabled>
+                </div>
+              </div>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="booking-summary" style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px;">
+              <div class="booking-summary-row">
+                <span>Base Rate</span>
+                <span id="summary-base-rate">&#8377;0.00/hr</span>
+              </div>
+              <div class="booking-summary-row">
+                <span>Premium Surcharge</span>
+                <span id="summary-zone-premium">&#8377;0.00</span>
+              </div>
+              <div class="booking-summary-row total">
+                <span>Total Amount</span>
+                <span id="summary-total-price">&#8377;0.00</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn" id="btn-submit-booking" style="margin-top: 16px;" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Pay & Confirm Spot
+            </button>
+          </form>
+        </div>
+
+      </section>
+
+      <!-- MIDDLE COLUMN: THE MAP -->
+      <section class="parking-map-container glass-panel">
+        <div class="map-header">
+          <div>
+            <h2 id="facility-map-title" style="font-size: 20px;">Facility Layout Map</h2>
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+              <p id="facility-map-desc" style="font-size: 12px; color: var(--text-secondary); margin: 0;">Interactive parking deck overview</p>
+              <span id="hub-weather-badge" style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-secondary);">Loading weather...</span>
+            </div>
+          </div>
+          
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-dot vacant"></span>
+              <span>Vacant</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot occupied"></span>
+              <span>Occupied</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot reserved"></span>
+              <span>Reserved</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drive/Level Controls & Filters -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 12px; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <div class="floor-selector">
+              <button class="floor-btn active" data-floor="1">Ground Floor</button>
+              <button class="floor-btn" data-floor="2">Level 2</button>
+            </div>
+            
+            <!-- Map Filter Toolbar -->
+            <div class="map-filters-bar" style="display: flex; background: rgba(13, 18, 34, 0.5); border: 1px solid var(--border-glass); padding: 4px; border-radius: 8px; gap: 4px;">
+              <button class="filter-btn active" data-filter="all">All</button>
+              <button class="filter-btn" data-filter="vacant">Vacant</button>
+              <button class="filter-btn" data-filter="ev">EV Charging</button>
+              <button class="filter-btn" data-filter="handicap">Accessible</button>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px;" id="live-time-indicator">
+            LIVE MONITORING
+          </span>
+        </div>
+
+        <!-- Visual Parking Grid -->
+        <div class="parking-garage">
+          
+          <!-- Zone A (Standard) -->
+          <div class="parking-zone" id="zone-standard">
+            <div class="zone-title">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
+              </svg>
+              Zone A - Standard Parking (&#8377;40/hr)
+            </div>
+            <div class="spots-row" id="row-zone-a">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+          <!-- Central Driveway lane -->
+          <div class="driveway">
+            <span>&larr; ENTRY</span>
+            <span>DRIVEWAY - NO PARKING</span>
+            <span>EXIT &rarr;</span>
+          </div>
+
+          <!-- Zone B & C (EV & Accessible) -->
+          <div class="parking-zone" id="zone-special">
+            <div class="zone-title">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/>
+                <path d="M11 6l-4 6h6l-4 6"/>
+              </svg>
+              Zone B & C - EV Charging (&#8377;60/hr) & Accessible (&#8377;30/hr)
+            </div>
+            <div class="spots-row" id="row-zone-bc">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: SIMULATOR & ANALYTICS -->
+      <section class="sidebar-panel" id="admin-sidebar-panel">
+        
+        <!-- Live Simulator Panel -->
+        <div class="glass-panel simulator-panel">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Local Activity Simulator
+          </h2>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="sim-status">
+              <span class="sim-status-dot" id="sim-status-dot"></span>
+              <span id="sim-status-text">Simulator Idle</span>
+            </span>
+            <button class="btn btn-secondary" id="btn-toggle-sim" style="width: auto; padding: 6px 12px; font-size: 12px;">
+              Start Auto-Sim
+            </button>
+          </div>
+
+          <div class="sim-control-grid">
+            <button class="btn btn-secondary" id="btn-trigger-arrival" style="padding: 10px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; color: var(--color-vacant);">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <polyline points="19 12 12 19 5 12"/>
+              </svg>
+              Sim Arrival
+            </button>
+            <button class="btn btn-secondary" id="btn-trigger-departure" style="padding: 10px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; color: var(--color-occupied);">
+                <line x1="12" y1="19" x2="12" y2="5"/>
+                <polyline points="5 12 12 5 19 12"/>
+              </svg>
+              Sim Depart
+            </button>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="sim-speed">Simulation Event Rate</label>
+            <select id="sim-speed" style="padding: 8px 14px; padding-left: 12px;">
+              <option value="6000">Slow (every 6s)</option>
+              <option value="3000" selected>Normal (every 3s)</option>
+              <option value="1500">Fast (every 1.5s)</option>
+            </select>
+          </div>
+
+          <div class="simulation-log" id="simulation-log">
+            <div class="log-entry">
+              <span class="log-time">[10:00:00]</span>
+              <span class="log-msg">Facility monitoring active.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Analytics Panel -->
+        <div class="glass-panel analytics-panel">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+            Occupancy Analytics
+          </h2>
+
+          <div class="chart-container">
+            <svg class="svg-chart" viewBox="0 0 300 150">
+              <defs>
+                <linearGradient id="chart-area-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0" />
+                </linearGradient>
+                <linearGradient id="chart-gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#3b82f6" />
+                  <stop offset="50%" stop-color="#8b5cf6" />
+                  <stop offset="100%" stop-color="#ec4899" />
+                </linearGradient>
+              </defs>
+              <line class="chart-grid" x1="40" y1="20" x2="280" y2="20" />
+              <line class="chart-grid" x1="40" y1="55" x2="280" y2="55" />
+              <line class="chart-grid" x1="40" y1="90" x2="280" y2="90" />
+              <line class="chart-grid" x1="40" y1="125" x2="280" y2="125" />
+              
+              <text class="chart-axis-text" x="15" y="24">100%</text>
+              <text class="chart-axis-text" x="20" y="60">50%</text>
+              <text class="chart-axis-text" x="25" y="95">25%</text>
+              <text class="chart-axis-text" x="25" y="130">0%</text>
+
+              <text class="chart-axis-text" x="40" y="145">08:00</text>
+              <text class="chart-axis-text" x="100" y="145">10:00</text>
+              <text class="chart-axis-text" x="160" y="145">12:00</text>
+              <text class="chart-axis-text" x="220" y="145">14:00</text>
+              <text class="chart-axis-text" x="265" y="145">NOW</text>
+
+              <path class="chart-area" id="chart-filled-path" d="M 40 125 L 40 125 Z" />
+              <path class="chart-line" id="chart-line-path" d="M 40 125 Z" />
+            </svg>
+          </div>
+
+          <div class="analytics-summary">
+            <div class="analytics-card">
+              <div class="analytics-card-label">Peak Occupancy</div>
+              <div class="analytics-card-val" id="analytics-peak">84%</div>
+            </div>
+            <div class="analytics-card">
+              <div class="analytics-card-label">Est. Revenue</div>
+              <div class="analytics-card-val text-gradient-neon" id="analytics-revenue">&#8377;2,840.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Audit / Transaction Ledger -->
+        <div class="glass-panel ledger-panel">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+              <line x1="12" y1="4" x2="12" y2="20"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+            </svg>
+            Transaction Ledger
+          </h2>
+          <div class="ledger-log-container" id="ledger-log-container" style="background: rgba(5,7,14,0.7); border: 1px solid var(--border-glass); border-radius: 10px; padding: 12px; height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+            <div style="color: var(--text-muted); font-size: 11px; text-align: center; margin-top: 60px;" id="ledger-empty-msg">No transactions recorded yet.</div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+    
+  </div>
+
+  <!-- TOAST ALERT SYSTEM -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- MODAL / OVERLAY FOR CHECKOUT & TICKET -->
+  <div class="overlay" id="checkout-overlay">
+    
+    <!-- State 1: Processing Checkout -->
+    <div class="checkout-modal glass-panel" id="modal-processing-state" style="display: none;">
+      <h3 style="font-size: 20px;">Processing Transaction</h3>
+      <div class="loading-spinner"></div>
+      <p style="color: var(--text-secondary); font-size: 14px;" id="payment-status-message">Contacting secure gateway...</p>
+    </div>
+
+    <!-- State 2: Receipt Ticket Display -->
+    <div class="checkout-modal glass-panel" id="modal-ticket-state" style="display: none; max-width: 400px; padding: 20px;">
+      <div class="success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </div>
+      
+      <h3 style="font-size: 18px; margin-bottom: -5px;">Payment Successful!</h3>
+      <p style="color: var(--color-vacant); font-size: 12px; font-weight: 700; margin-top: -10px;">Booking Spot Confirmed</p>
+
+      <!-- Digital Receipt -->
+      <div class="receipt-ticket">
+        <div class="ticket-header">
+          <div class="ticket-title">PARKING RESERVATION</div>
+          <div class="ticket-subtitle">OmniPark Network India</div>
+        </div>
+        
+        <div class="ticket-body">
+          <div class="ticket-row">
+            <span class="ticket-label">City:</span>
+            <span class="ticket-value" id="ticket-city">Delhi NCR</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Facility:</span>
+            <span class="ticket-value" id="ticket-facility">Connaught Place Hub</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Stall Reserved:</span>
+            <span class="ticket-value spot" id="ticket-spot">A5</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">License Plate:</span>
+            <span class="ticket-value" id="ticket-plate">DL-3C-AZ-9922</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Duration:</span>
+            <span class="ticket-value" id="ticket-duration">4 Hours</span>
+          </div>
+          <div class="ticket-row">
+            <span class="ticket-label">Payment Mode:</span>
+            <span class="ticket-value" id="ticket-method">BHIM UPI</span>
+          </div>
+          <div class="ticket-row" style="border-top: 1px dashed #e5e7eb; padding-top: 6px; margin-top: 4px;">
+            <span class="ticket-label" style="font-weight: 700; color: #111;">Total Paid:</span>
+            <span class="ticket-value" id="ticket-amount" style="font-size: 15px; color: #111;">&#8377;160.00</span>
+          </div>
+        </div>
+
+        <div class="ticket-footer">
+          <div class="barcode-visual"></div>
+          <span class="barcode-num" id="ticket-ref">OP-8392102-IN</span>
+          <span style="font-size: 9px; color: #9ca3af; margin-top: 4px;">Scan at gates upon arrival. Linked to FASTag scanner.</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; width: 100%;">
+        <button class="btn btn-secondary" onclick="window.print()" style="flex-grow: 1; padding: 10px; font-size: 13px;">Print Ticket</button>
+        <button class="btn" id="btn-close-ticket" style="flex-grow: 1; padding: 10px; font-size: 13px;">Done</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- APP CODE -->
+  <script src="app.js"></script>
+</body>
+</html>
